@@ -122,11 +122,36 @@ def football_etl_teams():
             Body=json.dumps(raw_data, ensure_ascii=False).encode('utf-8')
         )
 
+    @task()
+    def load_teams_db(teams_data: list) -> None:
+
+        connection = Variable.get('DB_CONNECTION')
+        engine = create_engine(connection)
+
+        all_teams = []
+        for league_batch in teams_data:
+            for team in league_batch:
+                all_teams.append(team)
+
+        data = pd.DataFrame(all_teams)
+
+        data.to_sql(
+            name = 'teams',
+            con=engine,
+            if_exists='append',
+            index=False
+        )
+
+
+
     raw = extract_teams.expand(league=LEAGUES)
     load_raw_teams_s3.expand(extracted=raw)
 
     teams_data = transform_teams.expand(raw=raw)
     players_data = transform_players.expand(raw=raw)
     competitions_data = transform_competitions.expand(raw=raw)
+
+
+    load_teams_db(teams_data)
 
 football_etl_teams()
