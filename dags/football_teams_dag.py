@@ -193,8 +193,6 @@ def football_etl_teams():
     competitions_data = transform_competitions.expand(raw=raw)
 
 
-    load_competition_db(competitions_data)
-    load_teams_db(teams_data)
-    load_players_db(players_data)
+    load_competition_db(competitions_data)>>load_teams_db(teams_data)>>load_players_db(players_data)
 
 football_etl_teams()
