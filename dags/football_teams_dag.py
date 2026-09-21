@@ -123,6 +123,27 @@ def football_etl_teams():
         )
 
     @task()
+    def load_competition_db(competitions_data: list) -> None:
+
+        connection = Variable.get('DB_CONNECTION')
+        engine = create_engine(connection)
+
+        all_competitions = []
+        for league_batch in competitions_data:
+            for competition in league_batch:
+                all_competitions.append(competition)
+
+        data = pd.DataFrame(all_competitions)
+
+        data.to_sql(
+            name='competitions',
+            con=engine,
+            if_exists='append',
+            index=False
+        )
+
+
+    @task()
     def load_teams_db(teams_data: list) -> None:
 
         connection = Variable.get('DB_CONNECTION')
@@ -144,6 +165,26 @@ def football_etl_teams():
 
 
 
+    @task()
+    def load_players_db(players_data: list) -> None:
+
+        connection = Variable.get('DB_CONNECTION')
+        engine = create_engine(connection)
+
+        all_players = []
+        for league_batch in players_data:
+            for player in league_batch:
+                all_players.append(player)
+
+        data = pd.DataFrame(all_players)
+
+        data.to_sql(
+            name='players',
+            con=engine,
+            if_exists='append',
+            index=False
+        )
+
     raw = extract_teams.expand(league=LEAGUES)
     load_raw_teams_s3.expand(extracted=raw)
 
@@ -152,6 +193,8 @@ def football_etl_teams():
     competitions_data = transform_competitions.expand(raw=raw)
 
 
+    load_competition_db(competitions_data)
     load_teams_db(teams_data)
+    load_players_db(players_data)
 
 football_etl_teams()
