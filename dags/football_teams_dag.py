@@ -47,6 +47,52 @@ def football_etl_teams():
         except Exception as e:
             raise Exception(f'API connection failed. Error: {e}')
 
+    @task()
+    def transform_teams(raw: dict) -> list[dict]:
+
+        data = raw['data']
+
+        return[
+            {
+                "team_id": team["id"],
+                "name": team["name"],
+                "abbreviation": team.get("tla"),
+                "stadium": team.get("venue"),
+                "address": team.get("address"),
+                "competition_id": data["competition"]["id"],
+            }
+            for team in data["teams"]
+        ]
+
+    @task()
+    def transform_players(raw: dict) -> list[dict]:
+
+        data = raw['data']
+
+        return [
+                {
+                    'player_id': player['id'],
+                    'name': player['name'],
+                    "team_id": team["id"],
+                    'position': player.get('position'),
+                    'date_of_birth': player.get('dateOfBirth'),
+                    'nationality': player.get('nationality')
+                }
+
+            for team in data['teams']
+            for player in team.get('squad', [])
+        ]
+
+
+    @task()
+    def transform_competitions(raw: dict) -> list[dict]:
+
+        competition = raw['data']['competition']
+
+        return [{
+            'competition_id': competition['id'],
+            'competition_name': competition['name']
+        }]
 
 
 
@@ -76,8 +122,11 @@ def football_etl_teams():
             Body=json.dumps(raw_data, ensure_ascii=False).encode('utf-8')
         )
 
-
     raw = extract_teams.expand(league=LEAGUES)
     load_raw_teams_s3.expand(extracted=raw)
+
+    teams_data = transform_teams.expand(raw=raw)
+    players_data = transform_players.expand(raw=raw)
+    competitions_data = transform_competitions.expand(raw=raw)
 
 football_etl_teams()
