@@ -177,6 +177,7 @@ def football_etl_teams():
                 all_players.append(player)
 
         data = pd.DataFrame(all_players)
+        data.drop_duplicates(subset='player_id', keep='first')
 
         data.to_sql(
             name='players',
