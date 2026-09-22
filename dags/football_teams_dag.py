@@ -5,11 +5,9 @@ import requests
 from airflow.decorators import dag, task
 from airflow.models import Variable
 import boto3
-from sqlalchemy import create_engine
-from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from sqlalchemy import create_engine, text
 
 
-# Настройка для всех задач в Dag
 default_args = {
     'owner': 'Sergey',
     'retries': 3,
@@ -18,12 +16,12 @@ default_args = {
 
 @dag(
     dag_id='football_teams_dag',
-    description='Fetching data of football teams and load to database and S3',
+    description='Fetching data of football teams, players and load to database and S3',
     default_args=default_args,
     start_date=datetime(2026, 5, 23),
-    schedule='@hourly',
+    schedule='@daily',
     catchup=False,
-    tags=['crypto', 'etl', 'yandex', 'gecko']
+    tags=['football', 'etl', 's3yandex' ]
 )
 def football_etl_teams():
 
@@ -123,6 +121,16 @@ def football_etl_teams():
         )
 
     @task()
+    def clear_db() -> None:
+        connection = Variable.get('DB_CONNECTION')
+        engine = create_engine(connection)
+
+        with engine.connect() as conn:
+            conn.execute(text('TRUNCATE players, teams, competitions RESTART IDENTITY CASCADE;'))
+            conn.commit()
+
+
+    @task()
     def load_competition_db(competitions_data: list) -> None:
 
         connection = Variable.get('DB_CONNECTION')
@@ -194,6 +202,6 @@ def football_etl_teams():
     competitions_data = transform_competitions.expand(raw=raw)
 
 
-    load_competition_db(competitions_data)>>load_teams_db(teams_data)>>load_players_db(players_data)
+    clear_db()>>load_competition_db(competitions_data)>>load_teams_db(teams_data)>>load_players_db(players_data)
 
 football_etl_teams()
