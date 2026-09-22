@@ -125,9 +125,8 @@ def football_etl_teams():
         connection = Variable.get('DB_CONNECTION')
         engine = create_engine(connection)
 
-        with engine.connect() as conn:
+        with engine.begin() as conn:
             conn.execute(text('TRUNCATE players, teams, competitions RESTART IDENTITY CASCADE;'))
-            conn.commit()
 
 
     @task()
