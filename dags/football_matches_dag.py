@@ -5,6 +5,7 @@ import requests
 from airflow.decorators import dag, task
 from airflow.models import Variable
 import boto3
+from pendulum import yesterday
 from sqlalchemy import create_engine, text
 from datetime import date, timedelta
 
@@ -100,7 +101,7 @@ def football_etl_matches():
         league = extracted['league']
         raw_data = extracted['data']
 
-        key = f'raw/matches/{league}-matches.json'
+        key = f'raw/matches/{league}-matches/{yesterday}.json'
 
         s3.put_object(
             Bucket=bucket,
