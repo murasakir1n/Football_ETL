@@ -16,7 +16,7 @@ default_args = {
 }
 
 @dag(
-    dag_id='football_teams_dag',
+    dag_id='football_matches_dag',
     description='Fetching data of football matches and load to database and S3',
     default_args=default_args,
     start_date=datetime(2026, 5, 23),
