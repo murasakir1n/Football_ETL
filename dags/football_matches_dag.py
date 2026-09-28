@@ -101,7 +101,8 @@ def football_etl_matches():
         league = extracted['league']
         raw_data = extracted['data']
 
-        key = f'raw/matches/{league}-matches/{yesterday}.json'
+        yesterday = date.today() - timedelta(days=1)
+        key = f'raw/matches/{league}/{yesterday}.json'
 
         s3.put_object(
             Bucket=bucket,
