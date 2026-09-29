@@ -5,6 +5,7 @@ import requests
 from airflow.decorators import dag, task
 from airflow.models import Variable
 import boto3
+from charset_normalizer import cd
 from pendulum import yesterday
 from sqlalchemy import create_engine, text
 from datetime import date, timedelta
@@ -73,7 +74,9 @@ def football_etl_matches():
             result.append({
                 'match_id': match['id'],
                 'competition_id': data['competition']['id'],
+                'home_team_id': match['homeTeam']['id'],
                 'home_team': match['homeTeam']['name'],
+                'away_team_id': match['awayTeam']['id'],
                 'away_team': match['awayTeam']['name'],
                 'scores_home_team': match['score']['fullTime']['home'],
                 'scores_away_team': match['score']['fullTime']['away'],
@@ -110,8 +113,32 @@ def football_etl_matches():
             Body=json.dumps(raw_data, ensure_ascii=False).encode('utf-8')
         )
 
+    @task()
+    def load_matches_db(matches_data: list) -> None:
+
+        connection = Variable.get("DB_CONNECTION")
+        engine = create_engine(connection)
+
+        all_matches = []
+        for league_batch in matches_data:
+            for match in league_batch:
+                all_matches.append(match)
+
+        data = pd.DataFrame(all_matches)
+
+        data.to_sql(
+            name='matches',
+            con=engine,
+            if_exists='append',
+            index=False
+        )
+
 
     raw = extract_matches.expand(league=LEAGUES)
     load_raw_matches_to_s3.expand(extracted=raw)
+
+    matches_data = transform_matches.expand(raw=raw)
+
+    load_matches_db(matches_data)
 
 football_etl_matches()

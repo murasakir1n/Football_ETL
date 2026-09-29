@@ -24,7 +24,9 @@ CREATE TABLE IF NOT EXISTS players(
 CREATE TABLE IF NOT EXISTS matches(
     match_id INTEGER PRIMARY KEY,
     competition_id INTEGER REFERENCES competitions(competition_id),
+    home_team_id INTEGER REFERENCES teams(team_id),
     home_team TEXT,
+    away_team_id INTEGER REFERENCES teams(team_id),
     away_team TEXT,
     scores_home_team INTEGER,
     scores_away_team INTEGER,
