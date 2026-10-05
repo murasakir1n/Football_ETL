@@ -36,8 +36,9 @@ def football_etl_matches():
     def extract_matches(league: str) -> dict:
         try:
 
+            week_ago = date.today() - timedelta(days=7)
             yesterday = date.today() - timedelta(days=1)
-            params = {'dateFrom': str(yesterday), 'dateTo': str(yesterday)}
+            params = {'dateFrom': str(week_ago), 'dateTo': str(yesterday)}
 
             api_key = Variable.get('api_key')
 
