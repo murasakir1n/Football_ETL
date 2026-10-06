@@ -126,14 +126,26 @@ def football_etl_matches():
                 all_matches.append(match)
 
         data = pd.DataFrame(all_matches)
-        data = data.drop_duplicates(subset='match_id')
+        data = data.drop_duplicates(subset='match_id', keep='first')
 
-        data.to_sql(
-            name='matches',
-            con=engine,
-            if_exists='append',
-            index=False
-        )
+        records = data.to_dict(orient='records')
+
+        upsert_query = text('''
+                            INSERT INTO matches (match_id, competition_id, home_team_id, home_team,
+                                                 away_team_id, away_team, scores_home_team,
+                                                 scores_away_team, referee_id, referee_name)
+                            VALUES (:match_id, :competition_id, :home_team_id, :home_team,
+                                    :away_team_id, :away_team, :scores_home_team,
+                                    :scores_away_team, :referee_id, :referee_name)
+                            ON CONFLICT (match_id) DO UPDATE SET scores_home_team = EXCLUDED.scores_home_team,
+                                                                 scores_away_team = EXCLUDED.scores_away_team,
+                                                                 referee_id       = EXCLUDED.referee_id,
+                                                                 referee_name     = EXCLUDED.referee_name
+                            ''')
+
+        with engine.begin() as conn:
+            for record in records:
+                conn.execute(upsert_query, record)
 
 
     raw = extract_matches.expand(league=LEAGUES)
