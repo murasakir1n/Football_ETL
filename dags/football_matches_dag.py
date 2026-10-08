@@ -148,6 +148,7 @@ def football_etl_matches():
             for record in records:
                 conn.execute(upsert_query, record)
 
+    @task()
     def sync_matches_to_clickhouse():
 
         pg_conn = psycopg2.connect(Variable.get("DB_CONNECTION"))
