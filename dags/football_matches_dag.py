@@ -5,11 +5,12 @@ import requests
 from airflow.decorators import dag, task
 from airflow.models import Variable
 import boto3
-from charset_normalizer import cd
-from pendulum import yesterday
 from sqlalchemy import create_engine, text
 from datetime import date, timedelta
+import psycopg2
+import clickhouse_connect
 
+from sqlalchemy.dialects.postgresql import psycopg2
 
 default_args = {
     'owner': 'Sergey',
@@ -147,6 +148,22 @@ def football_etl_matches():
             for record in records:
                 conn.execute(upsert_query, record)
 
+    def sync_matches_to_clickhouse():
+
+        pg_conn = psycopg2.connect(Variable.get("DB_CONNECTION"))
+        cursor = pg_conn.cursor()
+        cursor.execute("SELECT * FROM matches")
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+
+        ch_client = clickhouse_connect.get_client(
+            host='clickhouse',
+            port=8123,
+            username='murasakir1n'
+        )
+
+        ch_client.insert('matches', rows,column_names=columns)
+
 
     raw = extract_matches.expand(league=LEAGUES)
     load_raw_matches_to_s3.expand(extracted=raw)
@@ -154,5 +171,7 @@ def football_etl_matches():
     matches_data = transform_matches.expand(raw=raw)
 
     load_matches_db(matches_data)
+
+    sync_matches_to_clickhouse()
 
 football_etl_matches()
