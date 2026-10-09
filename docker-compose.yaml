@@ -15,7 +15,6 @@ x-airflow-common:
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
     - ./data:/opt/airflow/data
-  user: "0:0"
   depends_on:
     postgres:
       condition: service_healthy
