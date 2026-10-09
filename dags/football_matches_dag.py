@@ -8,7 +8,6 @@ import boto3
 from sqlalchemy import create_engine, text
 from datetime import date, timedelta
 import psycopg2
-from sqlalchemy.dialects.postgresql import psycopg2
 import duckdb
 
 default_args = {
