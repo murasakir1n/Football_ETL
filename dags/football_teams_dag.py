@@ -22,7 +22,7 @@ default_args = {
     description='Fetching data of football teams, players and load to database and S3',
     default_args=default_args,
     start_date=datetime(2026, 5, 23),
-    schedule='None',
+    schedule='@daily',
     catchup=False,
     tags=['football', 'etl', 's3yandex' ]
 )
