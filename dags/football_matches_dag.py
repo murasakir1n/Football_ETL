@@ -4,6 +4,8 @@ import pandas as pd
 import requests
 from airflow.decorators import dag, task
 from airflow.models import Variable
+from airflow.providers.standard.sensors import external_task
+from airflow.sensors.external_task import ExternalTaskSensor
 import boto3
 from sqlalchemy import create_engine, text
 from datetime import date, timedelta
@@ -146,6 +148,15 @@ def football_etl_matches():
             for record in records:
                 conn.execute(upsert_query, record)
 
+    wait_for_sync = ExternalTaskSensor(
+        task_id='wait_for_sync',
+        external_dag_id='football_teams_dag',
+        external_task_id='sync_players_to_duckdb',
+        timeout=600,
+        poke_interval=30,
+        mode='reschedule'
+    )
+
     @task()
     def sync_matches_to_duckdb():
         pg_conn = psycopg2.connect(Variable.get('DB_CONNECTION'))
@@ -169,6 +180,11 @@ def football_etl_matches():
             rows
         )
         con.close()
+
+
+
+    wait_for_sync>>sync_matches_to_duckdb()
+
 
     raw = extract_matches.expand(league=LEAGUES)
     load_raw_matches_to_s3.expand(extracted=raw)

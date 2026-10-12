@@ -6,6 +6,9 @@ from airflow.decorators import dag, task
 from airflow.models import Variable
 import boto3
 from sqlalchemy import create_engine, text
+import psycopg2
+import duckdb
+from utils.duckdb_utils import sync_table_to_duckdb
 
 
 default_args = {
@@ -193,6 +196,18 @@ def football_etl_teams():
             index=False
         )
 
+    @task()
+    def sync_competition_to_duckdb():
+        sync_table_to_duckdb('competitions')
+
+    @task()
+    def sync_teams_to_duckdb():
+        sync_table_to_duckdb('teams')
+
+    @task()
+    def sync_players_to_duckdb():
+        sync_table_to_duckdb('players')
+
     raw = extract_teams.expand(league=LEAGUES)
     load_raw_teams_s3.expand(extracted=raw)
 
@@ -202,5 +217,7 @@ def football_etl_teams():
 
 
     clear_db()>>load_competition_db(competitions_data)>>load_teams_db(teams_data)>>load_players_db(players_data)
+
+    sync_competition_to_duckdb()>>sync_teams_to_duckdb()>>sync_players_to_duckdb()
 
 football_etl_teams()
