@@ -149,14 +149,6 @@ def football_etl_matches():
             for record in records:
                 conn.execute(upsert_query, record)
 
-    wait_for_sync = ExternalTaskSensor(
-        task_id='wait_for_sync',
-        external_dag_id='football_teams_dag',
-        external_task_id='sync_players_to_duckdb',
-        timeout=600,
-        poke_interval=30,
-        mode='reschedule'
-    )
 
     @task()
     def sync_matches_to_duckdb():
@@ -171,6 +163,6 @@ def football_etl_matches():
 
     matches_data = transform_matches.expand(raw=raw)
 
-    load_matches_db(matches_data)>>wait_for_sync>>sync_matches_to_duckdb()
+    load_matches_db(matches_data)>>sync_matches_to_duckdb()
 
 football_etl_matches()
