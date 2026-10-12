@@ -163,7 +163,7 @@ def football_etl_matches():
         sync_table_to_duckdb('matches')
 
 
-    wait_for_sync>>sync_matches_to_duckdb()
+
 
 
     raw = extract_matches.expand(league=LEAGUES)
@@ -171,7 +171,6 @@ def football_etl_matches():
 
     matches_data = transform_matches.expand(raw=raw)
 
-    load_matches_db(matches_data)
-    sync_matches_to_duckdb()
+    load_matches_db(matches_data)>>wait_for_sync>>sync_matches_to_duckdb()
 
 football_etl_matches()
