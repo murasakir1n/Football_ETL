@@ -216,8 +216,6 @@ def football_etl_teams():
     competitions_data = transform_competitions.expand(raw=raw)
 
 
-    clear_db()>>load_competition_db(competitions_data)>>load_teams_db(teams_data)>>load_players_db(players_data)
-
-    sync_competition_to_duckdb()>>sync_teams_to_duckdb()>>sync_players_to_duckdb()
+    clear_db()>>load_competition_db(competitions_data)>>load_teams_db(teams_data)>>load_players_db(players_data)>>sync_competition_to_duckdb()>>sync_teams_to_duckdb()>>sync_players_to_duckdb()
 
 football_etl_teams()
