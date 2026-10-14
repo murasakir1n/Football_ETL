@@ -149,10 +149,6 @@ def football_etl_matches():
                 conn.execute(upsert_query, record)
 
 
-    @task()
-    def sync_matches_to_duckdb():
-        sync_table_to_duckdb('matches')
-
 
 
 
