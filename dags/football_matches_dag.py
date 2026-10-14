@@ -158,6 +158,6 @@ def football_etl_matches():
 
     matches_data = transform_matches.expand(raw=raw)
 
-    load_matches_db(matches_data)>>sync_matches_to_duckdb()
+    load_matches_db(matches_data)
 
 football_etl_matches()
