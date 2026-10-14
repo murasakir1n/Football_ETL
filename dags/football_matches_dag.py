@@ -9,8 +9,7 @@ import boto3
 from sqlalchemy import create_engine, text
 from datetime import date, timedelta
 import psycopg2
-import duckdb
-from utils.duckdb_utils import sync_table_to_duckdb
+
 
 
 default_args = {
