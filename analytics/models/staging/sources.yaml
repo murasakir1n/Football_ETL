@@ -7,4 +7,4 @@ sources:
       - name: competitions
       - name: teams
       - name: matches
-
+      - name: players
