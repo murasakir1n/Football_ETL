@@ -19,3 +19,10 @@ models:
         data_tests:
           - unique
           - not_null
+  - name: average_age_by_nationality
+    description: "Shows average age of players by nationality"
+    columns:
+      - name: date_of_birth
+        description: "Key column for this view"
+        data_test:
+          - not null
