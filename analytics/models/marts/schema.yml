@@ -2,8 +2,8 @@
 version: 2
 
 models:
-  - name: home_away_wins
-    description: "Show counts of home and away teams wins"
+  - name: count_home_away_wins
+    description: "Show counts and difference of home and away teams wins"
     columns:
       - name: id
         description: "The primary key for this table"
