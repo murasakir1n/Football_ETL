@@ -1,0 +1,21 @@
+
+version: 2
+
+models:
+  - name: home_away_wins
+    description: "Show counts of home and away teams wins"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: avg_goals_per_competition
+    description: "Shows average goals per competition"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null

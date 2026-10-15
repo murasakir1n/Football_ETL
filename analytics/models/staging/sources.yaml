@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: football_data
+    schema: public
+    tables:
+      - name: competitions
+      - name: teams
+      - name: matches
+
