@@ -17,7 +17,7 @@ SELECT competition_id, team,
        SUM(sh) - SUM(sa)                          AS goal_diff,
        SUM(CASE WHEN sh > sa THEN 3 WHEN sh = sa THEN 1 ELSE 0 END) AS points
 FROM t
-group by competition_id, team
-order by competition_id, points desc, goal_diff desc;
+GROUP BY competition_id, team
+ORDER BY competition_id, points DESC, goal_diff DESC
 
 

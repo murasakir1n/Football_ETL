@@ -11,10 +11,10 @@ models:
           - unique
           - not_null
 
-  - name: avg_goals_per_competition
+  - name: average_goals_per_competition
     description: "Shows average goals per competition"
     columns:
-      - name: id
+      - name: competition_id
         description: "The primary key for this table"
         data_tests:
           - unique
