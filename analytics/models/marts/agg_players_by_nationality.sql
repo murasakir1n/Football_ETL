@@ -1,4 +1,4 @@
 select nationality, count(nationality) as nat_count
-from players p
+from {{ source('football_data', 'players') }}
 group by nationality
 order by nat_count desc

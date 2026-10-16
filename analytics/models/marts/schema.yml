@@ -19,10 +19,33 @@ models:
         data_tests:
           - unique
           - not_null
+
   - name: average_age_by_nationality
     description: "Shows average age of players by nationality"
     columns:
       - name: date_of_birth
         description: "Key column for this view"
-        data_test:
+        data_tests:
+          - not null
+
+  - name: agg_players_by_nationality
+    description: "Shows count of players by nationality"
+    columns:
+      - name: nationality
+        description: "Key column for this view"
+        data_tests:
+          - not null
+
+  - name: tournaments_table
+    description: "Show points among all competitions"
+    columns:
+      - name: home_team
+        description: "Team that plays at home"
+        data_tests:
+          - unique
+          - not null
+      - name: away_team
+        description: "Team that plays as guest"
+        data_tests:
+          - unique
           - not null
