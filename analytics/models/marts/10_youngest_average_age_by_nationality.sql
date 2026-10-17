@@ -4,4 +4,5 @@ FROM {{ source('football_data', 'players') }}
 WHERE date_of_birth IS NOT NULL
   AND EXTRACT(YEAR FROM AGE(date_of_birth)) >= 18
 GROUP BY nationality
-ORDER BY age DESC
+ORDER BY age
+limit 10
