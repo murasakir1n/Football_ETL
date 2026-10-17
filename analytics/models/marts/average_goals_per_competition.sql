@@ -9,3 +9,4 @@ JOIN {{ source('football_data', 'matches') }} m
 GROUP BY c.competition_id,
          c.competition_name
 ORDER BY avg_goals desc
+limit 7
