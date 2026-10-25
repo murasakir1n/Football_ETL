@@ -59,14 +59,14 @@ models:
         data_tests:
           - not_null
 
-      - name: is_home_win
+      - name: is_home_wins
         description: "1 if home team won, 0 otherwise"
         data_tests:
           - not_null
           - accepted_values:
               values: [ 0, 1 ]
 
-      - name: is_away_win
+      - name: is_away_wins
         description: "1 if away team won, 0 otherwise"
         data_tests:
           - not_null
@@ -119,5 +119,5 @@ models:
   - name: 10_youngest_average_age_by_nationality
     description: "Top 10 nationalities by lowest average age"
 
-  - name: 10_oldest_average_age_by
+  - name: 10_oldest_average_age_by_nationality
     description: "Top 10 nationalities by highest average age"
