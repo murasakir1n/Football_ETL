@@ -12,6 +12,6 @@ SELECT
     stadium,
     address,
     competition_id
-FROM {{ source('football_data', 'teams') }}
+FROM {{ source('football_etl', 'teams') }}
 WHERE team_id IS NOT NULL
 
