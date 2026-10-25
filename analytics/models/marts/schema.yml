@@ -59,14 +59,14 @@ models:
         data_tests:
           - not_null
 
-      - name: is_home_wins
+      - name: home_wins
         description: "1 if home team won, 0 otherwise"
         data_tests:
           - not_null
           - accepted_values:
               values: [ 0, 1 ]
 
-      - name: is_away_wins
+      - name: away_wins
         description: "1 if away team won, 0 otherwise"
         data_tests:
           - not_null
