@@ -8,5 +8,5 @@
 SELECT
     competition_id,
     competition_name
-FROM {{ source('football_etl', 'competition') }}
+FROM {{ source('football_etl', 'competitions') }}
 WHERE competition_id IS NOT NULL
