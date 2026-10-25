@@ -8,7 +8,7 @@
 SELECT
     team_id,
     name,
-    abreviation,
+    abbreviation,
     stadium,
     address,
     competition_id
