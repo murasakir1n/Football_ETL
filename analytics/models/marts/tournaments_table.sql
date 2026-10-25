@@ -2,11 +2,11 @@ WITH t AS (
 
 	SELECT competition_id, home_team AS team,
 			scores_home_team AS sh, scores_away_team AS sa
-	FROM {{ source('football_data', 'matches') }}
+	FROM {{ ref('stg_matches') }} m
 	UNION ALL
 	SELECT competition_id, away_team,
 			scores_away_team, scores_home_team
-	FROM {{ source('football_data', 'matches') }} m
+	FROM {{ ref('stg_matches') }} m
 )
 
 SELECT competition_id, team,

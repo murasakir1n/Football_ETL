@@ -1,51 +1,123 @@
-
 version: 2
 
+#Staging
+
 models:
-  - name: count_home_away_wins
-    description: "Show counts and difference of home and away teams wins"
+  - name: stg_players
+    description: "Cleaned player data with computed age"
     columns:
-      - name: id
-        description: "The primary key for this table"
+      - name: player_id
+        description: "Primary key"
+        data_tests:
+          - unique
+          - not_null
+      - name: age
+        description: "Player age in years"
+        data_tests:
+          - not_null
+
+  - name: stg_matches
+    description: "Cleaned match data with binary win flags"
+    columns:
+      - name: match_id
+        description: "Primary key"
         data_tests:
           - unique
           - not_null
 
-  - name: average_goals_per_competition
-    description: "Shows average goals per competition"
+      - name: competition_id
+        description: "Foreign key to competitions"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_competitions')
+              field: competition_id
+
+      - name: home_team_id
+        description: "Foreign key to home team"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_teams')
+              field: team_id
+
+      - name: away_team_id
+        description: "Foreign key to away team"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_teams')
+              field: team_id
+
+      - name: scores_home_team
+        description: "Goals scored by home team"
+        data_tests:
+          - not_null
+
+      - name: scores_away_team
+        description: "Goals scored by away team"
+        data_tests:
+          - not_null
+
+      - name: is_home_win
+        description: "1 if home team won, 0 otherwise"
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: [ 0, 1 ]
+
+      - name: is_away_win
+        description: "1 if away team won, 0 otherwise"
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: [ 0, 1 ]
+
+  - name: stg_competitions
+    description: "Cleaned competition data"
     columns:
       - name: competition_id
-        description: "The primary key for this table"
+        description: "Primary key"
         data_tests:
           - unique
           - not_null
-
-  - name: average_age_by_nationality
-    description: "Shows average age of players by nationality"
-    columns:
-      - name: date_of_birth
-        description: "Key column for this view"
+      - name: competition_name
+        description: "Competition name"
         data_tests:
-          - not null
+          - not_null
 
-  - name: agg_players_by_nationality
-    description: "Shows count of players by nationality"
+  - name: stg_teams
+    description: "Cleaned team data"
     columns:
-      - name: nationality
-        description: "Key column for this view"
+      - name: team_id
+        description: "Primary key"
         data_tests:
-          - not null
+          - unique
+          - not_null
+      - name: name
+        description: "Team name"
+        data_tests:
+          - not_null
+      - name: competition_id
+        description: "Foreign key to competitions"
+        data_tests:
+          - relationships:
+              to: ref('stg_competitions')
+              field: competition_id
+
+#Marts
+
+  - name: count_home_away_wins
+    description: "Home/away/draw win counts"
+
+  - name: average_goals_per_competition
+    description: "Average goals per match by competition (top 7)"
 
   - name: tournaments_table
-    description: "Show points among all competitions"
-    columns:
-      - name: home_team
-        description: "Team that plays at home"
-        data_tests:
-          - unique
-          - not null
-      - name: away_team
-        description: "Team that plays as guest"
-        data_tests:
-          - unique
-          - not null
+    description: "League standings for all competitions"
+
+  - name: 10_youngest_average_age_by_nationality
+    description: "Top 10 nationalities by lowest average age"
+
+  - name: 10_oldest_average_age_by
+    description: "Top 10 nationalities by highest average age"
